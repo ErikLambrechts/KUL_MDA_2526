@@ -44,13 +44,26 @@ def load_counts(year: int = None):
     if year:
         files = [f for f in files if f"data-{year}-" in f.name]
 
+    columns = [
+        "site ID",
+        "richting",
+        "type",
+        "van",
+        "tot",
+        "aantal",
+    ]
+
     dfs = []
     for f in files:
-        df = pd.read_csv(f, parse_dates=["van", "tot"])
+        df = pd.read_csv(
+            f,
+            header=None,
+            names=columns,
+            parse_dates=["van", "tot"]
+        )
         dfs.append(df)
 
     return pd.concat(dfs, ignore_index=True)
-
 
 def load_all():
     counts = load_counts()
