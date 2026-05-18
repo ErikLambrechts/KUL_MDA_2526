@@ -4,7 +4,7 @@ import geopandas as gpd
 import glob 
 
 # loading the cycling parquet data
-cycling = pd.read_parquet("D:/Ilonchyk/Masters/MDA/daily_final_combined_data.parquet", engine="fastparquet")
+cycling = pd.read_parquet("daily_final_combined_data.parquet", engine="fastparquet")
 cycling["date"] = pd.to_datetime(cycling["date"])
 cycling = cycling[
     (cycling["date"] >= "2024-01-01") &
@@ -16,7 +16,7 @@ print(cycling.info())
 print(cycling.describe())
 
 # loading the weather meta-data (has the exact coordinates of the grid cells)
-pixels = pd.read_csv("D:/Ilonchyk/Masters/MDA/climateGrid/climategrid_pixel_metadata.csv", sep=";")
+pixels = pd.read_csv("climategrid_pixel_metadata.csv", sep=";")
 pixels.head()
 
 # unique cycling sites
@@ -63,7 +63,7 @@ cycling = cycling.merge(
 )
 
 #combining all the weather data files 
-files = glob.glob("D:/Ilonchyk/Masters/MDA/climateGrid/climateGrid/*.csv")
+files = glob.glob("/climateGrid_*.csv")
 
 weather_list = []
 
