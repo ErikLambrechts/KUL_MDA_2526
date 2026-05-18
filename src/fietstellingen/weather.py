@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd # type: ignore
 from pathlib import Path
 from .config import DATA_DIR
 

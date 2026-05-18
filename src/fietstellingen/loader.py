@@ -1,8 +1,9 @@
-import pandas as pd
+import pandas as pd # type: ignore
+from typing import Optional
 from .config import COUNTS_DIR, META_DIR
 
 
-def load_sites():
+def load_sites() -> pd.DataFrame:
     columns = [
         "site ID",
         "site nr",
@@ -38,7 +39,7 @@ def load_directions():
     )
 
 
-def load_counts(year: int = None):
+def load_counts(year: Optional[int] = None):
     files = list(COUNTS_DIR.glob("data-*.csv"))
 
     if year:
