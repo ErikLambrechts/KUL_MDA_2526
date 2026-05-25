@@ -1,11 +1,21 @@
 import pandas as pd
 import numpy as np
-import statsmodels.api as sm
-import statsmodels.formula.api as smf
+from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 import seaborn as sns
 from models.weather_data2 import merged
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+daily = merged.groupby(
+    ["district", "date"]
+).agg({
+    "amount": "sum",
+    "temperature": "mean",
+    "precipitation": "mean",
+    "humidity": "mean",
+    "wind_speed": "mean",
+    "sunshine_duration": "mean"
+}).reset_index()
 
 merged["month"] = pd.to_datetime(
     merged["date"]).dt.month
@@ -22,61 +32,55 @@ merged = pd.get_dummies(
     drop_first=True
 )
 
-exclude = [
-    "amount",
-    "date",
-    "day",
-    "latitude",
-    "longitude",
-    "site_id",
-    "PIXEL_ID",
-    "type",
-    "source_month",
-    "direction",
-    "direction_name",
-    "site_nr",
-    "name_site",
-    "domain",
-    "path_nr",
-    "council",
-    "installation_date",
-    "pixel_id",
-    "short_wave_from_sky",
-    "evapotrans_ref",
-    "interval"
-]
+daily["log_amount"] = np.log1p(
+    daily["amount"]
+)
+
+results = {}
+
+districts = daily["district"].unique()
+
+for district in districts:
+
+    district_data = daily[
+        daily["district"] == district
+    ].copy()
 
 features = [
-    col for col in merged.columns
-    if col not in exclude
+    "temperature",
+    "precipitation",
+    "humidity",
+    "wind_speed",
+    "sunshine_duration",
+    "month",
+    "weekend"
 ]
 
-y = merged["amount"]
-x = merged[features]
+model_data = district_data[
+    features + ["log_amount"]
+].dropna()
 
-print(type(x))
-print(
-    x.select_dtypes(include=["object"]).columns
-)
+x = model_data[features]
+y = model_data["log_amount"]
 
-print(
-    x.select_dtypes(include=["bool"]).columns
-)
+x = x.apply(pd.to_numeric)
+x = x.astype(float)
+y = y.astype(float)
 
-bool_cols = x.select_dtypes(
-    include=["bool"]
-).columns
 
-x[bool_cols] = x[bool_cols].astype(int)
-
-x = sm.add_constant(x) #intercept
-model = sm.OLS(y, x).fit()
-print(model.summary())
+model = LinearRegression().fit(x, y)
+results[district] = {
+    "model": model,
+    "features": features,
+    "r_squared": model.score(x, y),
+    "coefficients": model.coef_,
+    "intercept": model.intercept_
+}
 
 #assumption checking
 ##residuals vs fitted values plot
-fitted = model.fittedvalues
-residuals = model.resid
+fitted = model.predict(x)
+residuals = y - fitted
 
 plt.scatter(fitted, residuals) 
 plt.axhline(0)
@@ -84,29 +88,10 @@ plt.xlabel("Fitted values")
 plt.ylabel("Residuals")
 plt.show() #residuals aren't scattered randomly around zero, indicating potential heteroscedasticity
 
-#normality of residuals
-sns.histplot(residuals, kde=True)
-plt.show() #seem to be mainly concentrated around 0 with some skewness 
-
-sm.qqplot(residuals, line="45")
-plt.show() #crazy pattern, not normal, need to use log transformation
-
-
-
-#log-linear
-merged["log_amount"] = np.log1p(
-    merged["amount"]
-)
-
-y = merged["log_amount"]
-
-model = sm.OLS(y, x).fit()
-print(model.summary())
-
 #assumptions for the log transformed model
 ##residuals vs fitted values plot
-fitted = model.fittedvalues
-residuals = model.resid
+fitted = model.predict(x)
+residuals = y - fitted
 
 plt.scatter(fitted, residuals) 
 plt.axhline(0)
@@ -115,11 +100,7 @@ plt.ylabel("Residuals")
 plt.show() #doesn't look much different than the previous one, still some heteroscedasticity because of the funnel shape 
 
 ##normality of residuals
-sns.histplot(residuals, kde=True)
-plt.show() #looks the same as before
 
-sm.qqplot(model.resid, line="45")
-plt.show() #looks much better, doesn't follow the line perfectky but is close
 
 ## multicollinearity
 vif = pd.DataFrame()

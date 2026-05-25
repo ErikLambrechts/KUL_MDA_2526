@@ -87,3 +87,14 @@ merged = cycling.merge(
     right_on=["pixel_id", "day"],
     how="left"
 )
+
+merged["month"] = pd.to_datetime(
+    merged["date"]).dt.month
+
+merged["day_of_week"] = pd.to_datetime(
+    merged["date"]).dt.dayofweek
+
+merged["weekend"] = (
+    merged["day_of_week"] >= 5).astype(int)
+
+merged = merged.dropna()
