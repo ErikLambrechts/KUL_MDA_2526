@@ -2,3 +2,5 @@ streamlit
 pandas
 plotly
 streamlit
+pyarrow
+statsmodels>=0.14.6
