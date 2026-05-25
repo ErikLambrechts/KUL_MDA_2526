@@ -73,9 +73,18 @@ def process_and_enrich_cycling_data(raw_csv_path):
     print("--- Step 2: Aggregating Raw Data to Daily Frequency (Memory Save Mode) ---")
     
     # Chunk reading prevents memory spikes. We group the raw data first.
+   # Chunk reading prevents memory spikes. We group the raw data first.
     chunks = []
     for chunk in pd.read_csv(raw_csv_path, chunksize=500_000):
+        # [NEW] Keep ONLY rows where the 'type' column is exactly 'FIETSERS'
+        chunk = chunk[chunk['type'] == 'FIETSERS']
+        
+        # Skip processing this chunk if it becomes empty after filtering
+        if chunk.empty:
+            continue
+            
         chunk['date'] = pd.to_datetime(chunk['from']).dt.normalize()
+        
         # Initial chunk-level reduction
         grouped_chunk = chunk.groupby(['site_id', 'direction', 'date'], as_index=False)['amount'].sum()
         chunks.append(grouped_chunk)
