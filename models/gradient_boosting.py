@@ -3,9 +3,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import pandas as pd
 import numpy as np
-from weather_data2 import merged
 from xgboost import XGBRegressor
 from lightgbm import LGBMRegressor
+
+merged = pd.read_parquet('data/MDA_Final_Dataset.parquet')
 
 # defining dates as separate variables
 merged["month"] = merged["date"].dt.month

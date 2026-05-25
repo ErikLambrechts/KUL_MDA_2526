@@ -7,6 +7,8 @@ import geopandas as gpd
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
+from models.models_pipeline import train_all_district_models_by_year
+
 # ==========================================
 # 1. CONFIGURATION (Set paths and dates here)
 # ==========================================
@@ -187,3 +189,8 @@ if __name__ == "__main__":
     final_output.to_parquet(final_path, engine="fastparquet", index=False)
     
     print(f"\nPipeline Complete Successfully! Final dataset saved to {final_path}")
+
+    # 5. Run the Multi-Model Analysis per District (Train 2024 -> Test 2025)
+    trained_pipelines = train_all_district_models_by_year(final_output)
+    
+    print("\nAll pipeline steps and model training sessions are complete!")

@@ -3,8 +3,9 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 import seaborn as sns
-from models.weather_data2 import merged
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+merged = pd.read_parquet('data/MDA_Final_Dataset.parquet')
 
 daily = merged.groupby(
     ["district", "date"]
@@ -115,7 +116,7 @@ vif["VIF"] = [
 print(vif) #temperature vatiables are highly correlated with y
 
 ##influential observations
-influence = model.get_influence()
+#influence = model.get_influence()
 
 cooks = influence.cooks_distance[0]
 
