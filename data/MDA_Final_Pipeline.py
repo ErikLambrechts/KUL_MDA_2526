@@ -7,7 +7,7 @@ import geopandas as gpd
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-from models.models_pipeline import train_all_district_models_by_year
+#from models.models_pipeline import train_all_district_models_by_year
 
 # ==========================================
 # 1. CONFIGURATION (Set paths and dates here)
@@ -190,7 +190,43 @@ if __name__ == "__main__":
     
     print(f"\nPipeline Complete Successfully! Final dataset saved to {final_path}")
 
-    # 5. Run the Multi-Model Analysis per District (Train 2024 -> Test 2025)
-    trained_pipelines = train_all_district_models_by_year(final_output)
-    
-    print("\nAll pipeline steps and model training sessions are complete!")
+    # ==========================================
+    # DOWNSTREAM WORKSPACE MODEL ORCHESTRATION
+    # ==========================================
+    import subprocess
+    import sys
+
+    print("\n" + "="*55)
+    print("      DATA PIPELINE COMPLETED SUCCESSFULLY!              ")
+    print("      TRIGGERING DOWNSTREAM ANALYSIS SCRIPTS             ")
+    print("="*55)
+
+    # Define paths to your individual execution files
+    models_script = r"D:\Ilonchyk\Masters\MDA\KUL_MDA_2526\models\models_pipeline.py"
+    analysis_script = r"D:\Ilonchyk\Masters\MDA\KUL_MDA_2526\models\advanced_analysis.py"
+
+    # 1. Trigger Supervised Regressions (Train 2024 -> Test 2025)
+    if os.path.exists(models_script):
+        print("\n>>> Launching: Supervised Predictive Engine...")
+        try:
+            subprocess.run([sys.executable, models_script], check=True)
+            print(" -> Supervised predictions completed cleanly.")
+        except subprocess.CalledProcessError as e:
+            print(f" [CRITICAL ERROR] Supervised pipeline failed with code: {e}")
+    else:
+        print(f" [WARNING] Expected supervised file missing at: {models_script}")
+
+    # 2. Trigger Unsupervised Clustering, PCA Plots & Anomalies
+    if os.path.exists(analysis_script):
+        print("\n>>> Launching: Exploratory & Unsupervised Mining Engine...")
+        try:
+            subprocess.run([sys.executable, analysis_script], check=True)
+            print(" -> Unsupervised pattern discovery completed cleanly.")
+        except subprocess.CalledProcessError as e:
+            print(f" [CRITICAL ERROR] Unsupervised pipeline failed with code: {e}")
+    else:
+        print(f" [WARNING] Expected analysis file missing at: {analysis_script}")
+
+    print("\n" + "="*55)
+    print("     ALL ANALYTICAL WORKSPACE SEQUENCES FINALIZED        ")
+    print("=======================================================\n")
