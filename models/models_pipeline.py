@@ -25,8 +25,8 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 # 1. GLOBAL SYSTEM CONFIGURATION & DIRECTORIES
 # ==========================================
 CONFIG = {
-    "INPUT_DATA_PATH": r"D:\Ilonchyk\Masters\MDA\KUL_MDA_2526\data\MDA_Final_Dataset.parquet",
-    "OUTPUT_DIRECTORY": r"D:\Ilonchyk\Masters\MDA\KUL_MDA_2526\data\outputs",
+    "INPUT_DATA_PATH": "./KUL_MDA_2526/data/MDA_Final_Dataset.parquet",
+    "OUTPUT_DIRECTORY": "./KUL_MDA_2526/data", 
     "EXPLICIT_WEATHER_COLS": ['temp_max', 'temp_min', 'temp_avg', 'precip_quantity', 'humidity_relative', 'pressure', 'sun_duration', 'short_wave_from_sky', 'evapotrans_ref']
 }
 
