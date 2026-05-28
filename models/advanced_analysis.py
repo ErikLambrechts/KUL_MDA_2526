@@ -14,8 +14,8 @@ from sklearn.ensemble import IsolationForest
 # 1. GLOBAL SYSTEM CONFIGURATION & DIRECTORIES
 # ==========================================
 CONFIG = {
-    "INPUT_DATA_PATH": r"D:\Ilonchyk\Masters\MDA\KUL_MDA_2526\data\MDA_Final_Dataset.parquet",
-    "OUTPUT_DIRECTORY": r"D:\Ilonchyk\Masters\MDA\KUL_MDA_2526\data\outputs",
+    "INPUT_DATA_PATH": "./KUL_MDA_2526/data/MDA_Final_Dataset.parquet",
+    "OUTPUT_DIRECTORY": r"./KUL_MDA_2526/data",
     "EXPLICIT_WEATHER_COLS": ['temp_max', 'temp_min', 'temp_avg', 'precip_quantity', 'humidity_relative', 'pressure', 'sun_duration', 'short_wave_from_sky', 'evapotrans_ref']
 }
 
@@ -103,7 +103,7 @@ final_output_path = os.path.join(CONFIG["OUTPUT_DIRECTORY"], "MDA_Analyzed_Datas
 df_clean.to_parquet(final_output_path, index=False)
 print(f"    -> Finished! Labeled master dataset written to:\n       {final_output_path}")
 
-# Display clear summaries to your console window
+
 print("\n=======================================================")
 print("          UNSUPERVISED RUN COMPLETE RESULTS            ")
 print("=======================================================")
