@@ -10,7 +10,7 @@ from dateutil.relativedelta import relativedelta
 #from models.models_pipeline import train_all_district_models_by_year
 
 # ==========================================
-# 1. CONFIGURATION (Set paths and dates here)
+# 1. CONFIGURATION
 # ==========================================
 CONFIG = {
     "START_DATE": datetime(2024, 1, 1), 
@@ -74,8 +74,7 @@ def download_cycling_data():
 def process_and_enrich_cycling_data(raw_csv_path):
     print("--- Step 2: Aggregating Raw Data to Daily Frequency (Memory Save Mode) ---")
     
-    # Chunk reading prevents memory spikes. We group the raw data first.
-   # Chunk reading prevents memory spikes. We group the raw data first.
+    # Chunk reading prevents memory spikes
     chunks = []
     for chunk in pd.read_csv(raw_csv_path, chunksize=500_000):
         # [NEW] Keep ONLY rows where the 'type' column is exactly 'FIETSERS'
@@ -201,9 +200,9 @@ if __name__ == "__main__":
     print("      TRIGGERING DOWNSTREAM ANALYSIS SCRIPTS             ")
     print("="*55)
 
-    # Define paths to your individual execution files
-    models_script = r"D:\Ilonchyk\Masters\MDA\KUL_MDA_2526\models\models_pipeline.py"
-    analysis_script = r"D:\Ilonchyk\Masters\MDA\KUL_MDA_2526\models\advanced_analysis.py"
+    # Define paths 
+    models_script = "./KUL_MDA_2526/models/models_pipeline.py"
+    analysis_script = "./KUL_MDA_2526/models/advanced_analysis.py"
 
     # 1. Trigger Supervised Regressions (Train 2024 -> Test 2025)
     if os.path.exists(models_script):
