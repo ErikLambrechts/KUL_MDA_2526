@@ -5,18 +5,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# ML Preprocessing, Scaling & Pipeline Engineering
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.exceptions import ConvergenceWarning
 
-# Pure Scikit-Learn Supervised Regression Kit
 from sklearn.linear_model import LinearRegression, PoissonRegressor, Ridge
 from sklearn.ensemble import RandomForestRegressor, HistGradientBoostingRegressor
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 
-# 0. SUPPRESS NOISY TERMINAL WARNINGS
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning) 
@@ -87,10 +84,9 @@ def load_and_cleanse_source_data():
     df = pd.read_parquet(CONFIG["INPUT_DATA_PATH"])
     df['date'] = pd.to_datetime(df['date'])
     
-    # Verify which configured weather metrics actually exist in the schema to avoid typos
+    # Verifying weather matrics
     available_weather = [col for col in CONFIG["EXPLICIT_WEATHER_COLS"] if col in df.columns]
     
-    # [FALLBACK FIX]: If your file uses lowercase weather column names, catch them automatically
     if len(available_weather) == 0:
         lowercase_targets = [col.lower() for col in CONFIG["EXPLICIT_WEATHER_COLS"]]
         available_weather = [col for col in lowercase_targets if col in df.columns]
@@ -99,14 +95,13 @@ def load_and_cleanse_source_data():
     if len(available_weather) == 0:
         raise ValueError("CRITICAL ERROR: No numeric weather columns found matching configuration criteria.")
     
-    # Drop rows containing missing metrics in vital modeling locations
+    # Drop rows containing missing metrics
     required_cols = ['amount', 'date', 'district'] + available_weather
     df_clean = df.dropna(subset=required_cols).copy()
     
-    # Enforce non-negative constraints required by Poisson links
+    # Enforce non-negative constraints
     df_clean = df_clean[df_clean['amount'] >= 0]
     
-    # [FIX]: Treat month as a continuous, robust seasonal integer to bypass "unknown categories" crashes
     df_clean['month'] = df_clean['date'].dt.month.astype(int)
     df_clean['day_of_week'] = df_clean['date'].dt.day_name()
     df_clean['is_weekend'] = df_clean['date'].dt.dayofweek.isin([5, 6]).astype(int)
@@ -149,8 +144,6 @@ def run_supervised_chronological_regression(df, weather_cols):
         train_window = district_data[(district_data['date'] >= '2024-01-01') & (district_data['date'] <= '2024-12-31')]
         test_window = district_data[(district_data['date'] >= '2025-01-01') & (district_data['date'] <= '2025-12-31')]
         
-        # [UPGRADED FILTER]: Require a proper seasonal spread (minimum 500 rows per window) 
-        # to skip fragmented subsets that create broken baselines
         if len(train_window) < 500 or len(test_window) < 500:
             print(f"    [! Skipping {district}]: Insufficient full-season profile logs (Train: {len(train_window)}, Test: {len(test_window)})")
             continue
