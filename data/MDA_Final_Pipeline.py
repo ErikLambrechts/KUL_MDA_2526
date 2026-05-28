@@ -15,9 +15,9 @@ from dateutil.relativedelta import relativedelta
 CONFIG = {
     "START_DATE": datetime(2024, 1, 1), 
     "END_DATE": datetime(2025, 12, 31),
-    "DATA_DIR": r"D:\Ilonchyk\Masters\MDA\KUL_MDA_2526\data",
-    "CLIMATE_GRID_DIR": r"D:\Ilonchyk\Masters\MDA\climateGrid\climateGrid",
-    "CLIMATE_METADATA_FILE": r"D:\Ilonchyk\Masters\MDA\climateGrid\climategrid_pixel_metadata.csv"
+    "DATA_DIR": "./KUL_MDA_2526/data",
+    "CLIMATE_GRID_DIR": "./KUL_MDA_2526/data",
+    "CLIMATE_METADATA_FILE": "./KUL_MDA_2526/data/climategrid_pixel_metadata.csv"
 }
 
 # Ensure data directory exists
